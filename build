@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+clear
+
+env GOOS=windows GOARCH=amd64 go build -o ./binaries/c2c.exe main.go
+env GOOS=linux GOARCH=amd64 go build -o ./binaries/c2c main.go
+ls -lah ./binaries
