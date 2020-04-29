@@ -26,24 +26,29 @@ func main() {
 		// replace tabs with spaces
 		input = strings.Replace(input, "\t", " ", -1)
 
-		// if the input line contains a handled request
+		// if the log entry does not start with a { character
+		// then it's a entry that looks like :-
+		// 2020/04/20 06:45:59.015 info http.log.access.log0
 		// then extract the json object from the entry
-		if strings.Contains(input, "handled request") == true {
+		if string(input[0]) != "{" && strings.Contains(input, "handled request") == true {
 			input = input[strings.Index(input, "handled request ")+15 : len(input)]
 			input = strings.TrimSpace(input)
-
-			// extract the data elements from the json object
-			common = gjson.Get(input, "common_log").String()
-			referer = gjson.Get(input, "request.headers.Referer").String()
-			userAgent = gjson.Get(input, "request.headers.User-Agent").String()
-
-			// remove square brackets
-			referer = removeSquareBrackets(referer)
-			userAgent = removeSquareBrackets(userAgent)
-
-			// output combined log format
-			fmt.Println(common + " " + referer + " " + userAgent)
 		}
+
+		// if the log entry starts with a { character
+		// then it must be a complete JSON object like :-
+		// {"level":"info","ts":1588143602.7486432,"logger":"http.log.access.log0",
+		// extract the data elements from the json object
+		common = gjson.Get(input, "common_log").String()
+		referer = gjson.Get(input, "request.headers.Referer").String()
+		userAgent = gjson.Get(input, "request.headers.User-Agent").String()
+
+		// remove square brackets
+		referer = removeSquareBrackets(referer)
+		userAgent = removeSquareBrackets(userAgent)
+
+		// output combined log format
+		fmt.Println(common + " " + referer + " " + userAgent)
 	}
 	os.Exit(0)
 }
